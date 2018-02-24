@@ -1,6 +1,9 @@
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -13,6 +16,7 @@ public class TankClient extends Frame {
 	private final static String TITLE = "TankWar";
 	
 	private int x = 50,y = 50;
+	private Image offScreenImage = null;
 	
 	@Override
 	public void paint(Graphics g) {
@@ -21,6 +25,21 @@ public class TankClient extends Frame {
 		g.fillOval(x, y, 60, 60);
 		g.setColor(c);
 	}
+
+	@Override
+	public void update(Graphics g) {
+		if(offScreenImage == null) offScreenImage = createImage(WINDOW_WIDTH,WINDOW_HEIGHT);
+		
+		Graphics gOffScreen = offScreenImage.getGraphics();
+		Color c = gOffScreen.getColor();
+		gOffScreen.setColor(Color.BLACK);
+		gOffScreen.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		paint(gOffScreen);
+		gOffScreen.setColor(c);
+		g.drawImage(offScreenImage, 0 , 0, null);
+	}
+
+
 
 	public void launchFrame() {
 		this.setLocation(WINDOW_START_POSITION_X, WINDOW_START_POSITION_Y);
@@ -32,6 +51,27 @@ public class TankClient extends Frame {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
+		});
+		this.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				switch(e.getKeyCode()) {
+				case KeyEvent.VK_LEFT:
+					x -= 10;
+					break;
+				case KeyEvent.VK_RIGHT:
+					x += 10;
+					break;
+				case KeyEvent.VK_UP:
+					y -= 10;
+					break;
+				case KeyEvent.VK_DOWN:
+					y += 10;
+					break;
+				}
+			}
+			
 		});
 		this.setResizable(false);
 		this.setVisible(true);
@@ -48,7 +88,6 @@ public class TankClient extends Frame {
 		@Override
 		public void run() {
 			while(true) {
-				x += 10;
 				repaint();
 				try {
 					Thread.sleep(100);
