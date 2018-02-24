@@ -15,15 +15,12 @@ public class TankClient extends Frame {
 	private final static int WINDOW_START_POSITION_Y = 80;
 	private final static String TITLE = "TankWar";
 	
-	private int x = 50,y = 50;
+	private Tank myTank = new Tank(450,550);
 	private Image offScreenImage = null;
 	
 	@Override
 	public void paint(Graphics g) {
-		Color c = g.getColor();
-		g.setColor(Color.RED);
-		g.fillOval(x, y, 60, 60);
-		g.setColor(c);
+		myTank.draw(g);
 	}
 
 	@Override
@@ -56,20 +53,12 @@ public class TankClient extends Frame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				switch(e.getKeyCode()) {
-				case KeyEvent.VK_LEFT:
-					x -= 10;
-					break;
-				case KeyEvent.VK_RIGHT:
-					x += 10;
-					break;
-				case KeyEvent.VK_UP:
-					y -= 10;
-					break;
-				case KeyEvent.VK_DOWN:
-					y += 10;
-					break;
-				}
+				myTank.KeyPress(e);
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				myTank.KeyReleased(e);
 			}
 			
 		});
