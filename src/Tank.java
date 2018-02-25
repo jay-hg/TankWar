@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class Tank {
 	private int y;
 	private String resourseID;
 	private Direction direction;
+	private boolean good;
 	private int life;
 	TankClient tc;
 	
@@ -30,6 +32,31 @@ public class Tank {
 		this.x = x;
 		this.y = y;
 		this.tc = tc;
+	}
+
+	public Tank(int x, int y, boolean good, TankClient tc) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.good = good;
+		this.tc = tc;
+	}
+
+	public Tank(int x, int y, boolean good, int life, TankClient tc) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.good = good;
+		this.life = life;
+		this.tc = tc;
+	}
+
+	public boolean isGood() {
+		return good;
+	}
+
+	public void setGood(boolean good) {
+		this.good = good;
 	}
 
 	public int getX() {
@@ -67,7 +94,8 @@ public class Tank {
 	public void draw(Graphics g) {
 		move();
 		Color c = g.getColor();
-		g.setColor(Color.RED);
+		if(this.good)g.setColor(Color.RED);
+		else g.setColor(Color.BLUE);
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		g.setColor(c);
 	}
@@ -165,9 +193,14 @@ public class Tank {
 	public Missile attack() {
 		Missile missile = new Missile(this.x+this.TANK_WIDTH/2-Missile.MISSILE_SIZE/2,
 				this.y+TANK_HEIGHT/2-Missile.MISSILE_SIZE/2,
-				this.direction);
+				this.direction,
+				this.tc);
 		missile.setVisiable(true);
 		if(tc != null) tc.getMissiles().add(missile);
 		return missile;
+	}
+	
+	public Rectangle getRect() {
+		return new Rectangle(x,y,this.TANK_WIDTH,TANK_HEIGHT);
 	}
 }

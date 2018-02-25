@@ -18,8 +18,10 @@ public class TankClient extends Frame {
 	private final static int WINDOW_START_POSITION_Y = 80;
 	private final static String TITLE = "TankWar";
 	
-	private Tank myTank = new Tank(450,550,this);
+	private Tank myTank = new Tank(450,550,true,5,this);
+	private Tank enemy = new Tank(200,200,false,1,this);
 	private List<Missile> missiles = new LinkedList<Missile>();
+	private List<Exploder> exploders = new LinkedList<Exploder>();
 	private Image offScreenImage = null;
 	
 	public List<Missile> getMissiles() {
@@ -30,16 +32,34 @@ public class TankClient extends Frame {
 		this.missiles = missiles;
 	}
 
+	public List<Exploder> getExploders() {
+		return exploders;
+	}
+
+	public void setExploders(List<Exploder> exploders) {
+		this.exploders = exploders;
+	}
+
 	@Override
 	public void paint(Graphics g) {
 		for(ListIterator<Missile> iterator = (ListIterator<Missile>) missiles.iterator();iterator.hasNext();) {
 			Missile missile = iterator.next();
+			missile.hitTank(enemy);
 			if(missile != null) {
 				if(missile.isVisiable()) missile.draw(g);
 				else iterator.remove();
 			}
 		}
 		myTank.draw(g);
+		if(enemy.getLife() != 0) enemy.draw(g);
+		
+		for(ListIterator<Exploder> iterator = (ListIterator<Exploder>) exploders.iterator();iterator.hasNext();) {
+			Exploder exploder = iterator.next();
+			if(exploder != null) {
+				if(exploder.isLive()) exploder.draw(g);
+				else iterator.remove();
+			}
+		}
 	}
 
 	@Override
