@@ -42,6 +42,7 @@ public class Missile {
 	
 	public void draw(Graphics g) {
 		move();
+		clearMissile();
 		Color c = g.getColor();
 		g.setColor(Color.BLUE);
 		g.fillOval(x, y, MISSILE_SIZE, MISSILE_SIZE);
@@ -79,5 +80,11 @@ public class Missile {
 			y -= MISSILE_SPEED;
 			break;
 		}
+	}
+	
+	void clearMissile() {
+		if(x<0-MISSILE_SIZE || x>TankClient.WINDOW_WIDTH ||
+				y<0-MISSILE_SIZE || y>TankClient.WINDOW_HEIGHT) 
+			this.visiable = false;
 	}
 }

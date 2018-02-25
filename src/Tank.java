@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 
 public class Tank {
@@ -17,7 +18,20 @@ public class Tank {
 	private String resourseID;
 	private Direction direction;
 	private int life;
-	private Missile missile;
+	TankClient tc;
+	
+	public Tank(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public Tank(int x, int y, TankClient tc) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.tc = tc;
+	}
+
 	public int getX() {
 		return x;
 	}
@@ -49,14 +63,9 @@ public class Tank {
 	public void setMoving(boolean moving) {
 		this.moving = moving;
 	}
-	public Tank(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
 	
 	public void draw(Graphics g) {
 		move();
-		if(missile!=null && missile.isVisiable()) missile.draw(g);
 		Color c = g.getColor();
 		g.setColor(Color.RED);
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
@@ -77,9 +86,6 @@ public class Tank {
 		case KeyEvent.VK_DOWN:
 			bD = true;
 			break;
-		case KeyEvent.VK_CONTROL:
-			missile = attack();
-			break;
 		}
 	}
 	
@@ -96,6 +102,9 @@ public class Tank {
 			break;
 		case KeyEvent.VK_DOWN:
 			bD = false;
+			break;
+		case KeyEvent.VK_CONTROL:
+			attack();
 			break;
 		}
 	}
@@ -133,6 +142,11 @@ public class Tank {
 			y -= TANK_SPEED_Y;
 			break;
 		}
+		
+		if(x<0) x = 0;
+		else if(x>TankClient.WINDOW_WIDTH-this.TANK_WIDTH) x = TankClient.WINDOW_WIDTH-this.TANK_WIDTH;
+		if(y<0) y = 0;
+		else if(y>TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT) y = TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT;
 	}
 	
 	void locateDirection() {
@@ -153,6 +167,7 @@ public class Tank {
 				this.y+TANK_HEIGHT/2-Missile.MISSILE_SIZE/2,
 				this.direction);
 		missile.setVisiable(true);
+		if(tc != null) tc.getMissiles().add(missile);
 		return missile;
 	}
 }

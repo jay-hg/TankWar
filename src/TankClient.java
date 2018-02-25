@@ -6,20 +6,39 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 
 public class TankClient extends Frame {
-	private final static int WINDOW_HEIGHT = 600;
-	private final static int WINDOW_WIDTH = 800;
+	public final static int WINDOW_HEIGHT = 600;
+	public final static int WINDOW_WIDTH = 800;
 	private final static int WINDOW_START_POSITION_X = 100;
 	private final static int WINDOW_START_POSITION_Y = 80;
 	private final static String TITLE = "TankWar";
 	
-	private Tank myTank = new Tank(450,550);
+	private Tank myTank = new Tank(450,550,this);
+	private List<Missile> missiles = new LinkedList<Missile>();
 	private Image offScreenImage = null;
 	
+	public List<Missile> getMissiles() {
+		return missiles;
+	}
+
+	public void setMissiles(List<Missile> missiles) {
+		this.missiles = missiles;
+	}
+
 	@Override
 	public void paint(Graphics g) {
+		for(ListIterator<Missile> iterator = (ListIterator<Missile>) missiles.iterator();iterator.hasNext();) {
+			Missile missile = iterator.next();
+			if(missile != null) {
+				if(missile.isVisiable()) missile.draw(g);
+				else iterator.remove();
+			}
+		}
 		myTank.draw(g);
 	}
 
