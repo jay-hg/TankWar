@@ -9,6 +9,7 @@ public class Tank {
 	private final static int TANK_SPEED_X = 5;
 	private final static int TANK_SPEED_Y = 5;
 	private boolean bL, bD, bR, bU;
+	private boolean moving = true;
 	enum Direction{U,RU,R,RD,D,LD,L,LU,STOP};
 	
 	private int x;
@@ -16,6 +17,7 @@ public class Tank {
 	private String resourseID;
 	private Direction direction;
 	private int life;
+	private Missile missile;
 	public int getX() {
 		return x;
 	}
@@ -41,6 +43,12 @@ public class Tank {
 		this.life = life;
 	}
 	
+	public boolean isMoving() {
+		return moving;
+	}
+	public void setMoving(boolean moving) {
+		this.moving = moving;
+	}
 	public Tank(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -48,6 +56,7 @@ public class Tank {
 	
 	public void draw(Graphics g) {
 		move();
+		if(missile!=null && missile.isVisiable()) missile.draw(g);
 		Color c = g.getColor();
 		g.setColor(Color.RED);
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
@@ -67,6 +76,9 @@ public class Tank {
 			break;
 		case KeyEvent.VK_DOWN:
 			bD = true;
+			break;
+		case KeyEvent.VK_CONTROL:
+			missile = attack();
 			break;
 		}
 	}
@@ -90,6 +102,7 @@ public class Tank {
 	
 	void move() {
 		locateDirection();
+		if(!moving) return;
 		switch(direction) {
 		case L:
 			x -= TANK_SPEED_X;
@@ -119,12 +132,11 @@ public class Tank {
 			x -= TANK_SPEED_X;
 			y -= TANK_SPEED_Y;
 			break;
-		case STOP:
-			break;
 		}
 	}
 	
 	void locateDirection() {
+		moving = true;
 		if(bL && !bD && !bR && !bU) direction = Direction.L;
 		else if(bL && bD && !bR && !bU) direction = Direction.LD;
 		else if(!bL && bD && !bR && !bU) direction = Direction.D;
@@ -133,6 +145,14 @@ public class Tank {
 		else if(!bL && !bD && bR && bU) direction = Direction.RU;
 		else if(!bL && !bD && !bR && bU) direction = Direction.U;
 		else if(bL && !bD && !bR && bU) direction = Direction.LU;
-		else if(!bL && !bD && !bR && !bU) direction = Direction.STOP;
+		else if(!bL && !bD && !bR && !bU) moving = false;
+	}
+	
+	public Missile attack() {
+		Missile missile = new Missile(this.x+this.TANK_WIDTH/2-Missile.MISSILE_SIZE/2,
+				this.y+TANK_HEIGHT/2-Missile.MISSILE_SIZE/2,
+				this.direction);
+		missile.setVisiable(true);
+		return missile;
 	}
 }
