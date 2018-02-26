@@ -2,17 +2,19 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.util.Random;
 
 
 public class Tank {
 	private final static int TANK_WIDTH = 60;
 	private final static int TANK_HEIGHT = 60;
-	private final static int TANK_SPEED_X = 5;
-	private final static int TANK_SPEED_Y = 5;
+	private final static int TANK_SPEED_X = 20;
+	private final static int TANK_SPEED_Y = 20;
 	private boolean bL, bD, bR, bU;
 	private boolean moving = true;
 	enum Direction{U,RU,R,RD,D,LD,L,LU,STOP};
+	public static Random random = new Random();
+	private int step = 0;
 	
 	private int x;
 	private int y;
@@ -46,6 +48,17 @@ public class Tank {
 		super();
 		this.x = x;
 		this.y = y;
+		this.good = good;
+		this.life = life;
+		this.tc = tc;
+	}
+
+	public Tank(int x, int y, Direction direction, boolean good, int life,
+			TankClient tc) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.direction = direction;
 		this.good = good;
 		this.life = life;
 		this.tc = tc;
@@ -179,22 +192,46 @@ public class Tank {
 	
 	void locateDirection() {
 		moving = true;
-		if(bL && !bD && !bR && !bU) direction = Direction.L;
-		else if(bL && bD && !bR && !bU) direction = Direction.LD;
-		else if(!bL && bD && !bR && !bU) direction = Direction.D;
-		else if(!bL && bD && bR && !bU) direction = Direction.RD;
-		else if(!bL && !bD && bR && !bU) direction = Direction.R;
-		else if(!bL && !bD && bR && bU) direction = Direction.RU;
-		else if(!bL && !bD && !bR && bU) direction = Direction.U;
-		else if(bL && !bD && !bR && bU) direction = Direction.LU;
-		else if(!bL && !bD && !bR && !bU) moving = false;
+		if(good) {
+			if(bL && !bD && !bR && !bU) direction = Direction.L;
+			else if(bL && bD && !bR && !bU) direction = Direction.LD;
+			else if(!bL && bD && !bR && !bU) direction = Direction.D;
+			else if(!bL && bD && bR && !bU) direction = Direction.RD;
+			else if(!bL && !bD && bR && !bU) direction = Direction.R;
+			else if(!bL && !bD && bR && bU) direction = Direction.RU;
+			else if(!bL && !bD && !bR && bU) direction = Direction.U;
+			else if(bL && !bD && !bR && bU) direction = Direction.LU;
+			else if(!bL && !bD && !bR && !bU) moving = false;
+		}
+		else {
+			if(step == 0) {
+				step = random.nextInt(13) + 3;
+				//敌方坦克改变方向
+				Direction[] directions = Direction.values();
+				int rn = random.nextInt(9);
+				if(rn == 8) moving = false;
+				else this.direction = directions[rn];
+			}
+			
+			step --;
+			
+			//敌方坦克有一定几率开炮
+			int fire = random.nextInt(4);
+			if(fire == 0) this.attack();
+		}
 	}
 	
 	public Missile attack() {
+//debug
+if(this.direction == null) {
+	System.out.println("tank direction null");
+	System.exit(1);
+}
 		Missile missile = new Missile(this.x+this.TANK_WIDTH/2-Missile.MISSILE_SIZE/2,
 				this.y+TANK_HEIGHT/2-Missile.MISSILE_SIZE/2,
 				this.direction,
 				this.tc);
+		missile.setGood(this.good);
 		missile.setVisiable(true);
 		if(tc != null) tc.getMissiles().add(missile);
 		return missile;

@@ -3,13 +3,14 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 public class Missile {
-	public final static int MISSILE_SPEED = 10;
+	public final static int MISSILE_SPEED = 30;
 	public final static int MISSILE_SIZE = 30;
 	private int x;
 	private int y;
 	private boolean visiable;
 	private Tank.Direction direction;
 	TankClient tc;
+	private boolean good;
 	public int getX() {
 		return x;
 	}
@@ -34,6 +35,12 @@ public class Missile {
 	public void setVisiable(boolean visiable) {
 		this.visiable = visiable;
 	}
+	public boolean isGood() {
+		return good;
+	}
+	public void setGood(boolean good) {
+		this.good = good;
+	}
 	public Missile(int x, int y, Tank.Direction direction) {
 		super();
 		this.x = x;
@@ -51,7 +58,8 @@ public class Missile {
 	public void draw(Graphics g) {
 		move();
 		Color c = g.getColor();
-		g.setColor(Color.WHITE);
+		if(good) g.setColor(Color.WHITE);
+		else g.setColor(Color.GRAY);
 		g.fillOval(x, y, MISSILE_SIZE, MISSILE_SIZE);
 		g.setColor(c);
 	}
@@ -98,13 +106,26 @@ public class Missile {
 	}
 	
 	public void hitTank(Tank tank) {
-		if(tank.isGood()) return;
-		if(tank.getLife() == 0) return;
-		if(this.getRect().intersects(tank.getRect())) {
-			this.visiable = false;
-			tank.setLife(0);
-			Exploder e = new Exploder(tank.getX(),tank.getY(),tc);
-			tc.getExploders().add(e);
+		if(this.good) {
+			if(tank.isGood()) return;
+			if(tank.getLife() == 0) return;
+			if(this.getRect().intersects(tank.getRect())) {
+				this.visiable = false;
+				tank.setLife(0);
+				Exploder e = new Exploder(tank.getX(),tank.getY(),tc);
+				tc.getExploders().add(e);
+			}
+		} else {
+			if(!tank.isGood()) return;
+			if(tank.getLife() == 0) return;
+			if(this.getRect().intersects(tank.getRect())) {
+				tank.setLife(tank.getLife()-1);
+				this.visiable = false;
+				if(tank.getLife() == 0) {
+					Exploder e = new Exploder(tank.getX(),tank.getY(),tc);
+					tc.getExploders().add(e);
+				}
+			}
 		}
 	}
 }

@@ -19,7 +19,7 @@ public class TankClient extends Frame {
 	private final static String TITLE = "TankWar";
 	
 	private Tank myTank = new Tank(450,550,true,5,this);
-	private Tank enemy = new Tank(200,200,false,1,this);
+	private List<Tank> enemies = new LinkedList<Tank>();
 	private List<Missile> missiles = new LinkedList<Missile>();
 	private List<Exploder> exploders = new LinkedList<Exploder>();
 	private Image offScreenImage = null;
@@ -42,17 +42,29 @@ public class TankClient extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
-		for(ListIterator<Missile> iterator = (ListIterator<Missile>) missiles.iterator();iterator.hasNext();) {
+		//子弹
+		for(ListIterator<Missile> iterator = missiles.listIterator();iterator.hasNext();) {
 			Missile missile = iterator.next();
-			missile.hitTank(enemy);
+			//子弹打坦克
+			for(ListIterator<Tank> it = enemies.listIterator();it.hasNext();) {
+				Tank enemy = it.next();
+				missile.hitTank(enemy);
+				missile.hitTank(myTank);
+			}
 			if(missile != null) {
 				if(missile.isVisiable()) missile.draw(g);
 				else iterator.remove();
 			}
 		}
-		myTank.draw(g);
-		if(enemy.getLife() != 0) enemy.draw(g);
-		
+		//我方坦克
+		if(myTank.getLife() != 0) myTank.draw(g);
+		//敌方坦克
+		for(ListIterator<Tank> iterator = enemies.listIterator();iterator.hasNext();) {
+			Tank enemy = iterator.next();
+			if(enemy.getLife() != 0) enemy.draw(g);
+			else iterator.remove();
+		}
+		//爆炸效果
 		for(ListIterator<Exploder> iterator = (ListIterator<Exploder>) exploders.iterator();iterator.hasNext();) {
 			Exploder exploder = iterator.next();
 			if(exploder != null) {
@@ -108,6 +120,10 @@ public class TankClient extends Frame {
 	
 	public static void main(String[] args) {
 		TankClient tankClient = new TankClient();
+		for(int i=0;i<5;i++) {
+			Tank t = new Tank(50+i*100,250,Tank.Direction.D,false,1,tankClient);
+			tankClient.enemies.add(t);
+		}
 		tankClient.launchFrame();
 	}
 	
