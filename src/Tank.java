@@ -12,7 +12,7 @@ public class Tank {
 	private final static int TANK_SPEED_Y = 20;
 	private boolean bL, bD, bR, bU;
 	private boolean moving = true;
-	enum Direction{U,RU,R,RD,D,LD,L,LU,STOP};
+	enum Direction{U,RU,R,RD,D,LD,L,LU};
 	public static Random random = new Random();
 	private int step = 0;
 	
@@ -107,7 +107,12 @@ public class Tank {
 	public void draw(Graphics g) {
 		move();
 		Color c = g.getColor();
-		if(this.good)g.setColor(Color.RED);
+		if(this.good){
+			g.setColor(Color.white);
+			g.drawRect(x, y-20, this.TANK_WIDTH, 10);
+			g.setColor(Color.RED);
+			g.fillRect(x, y-19, TANK_WIDTH*this.life/5, 8);
+		}
 		else g.setColor(Color.BLUE);
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		g.setColor(c);
@@ -146,6 +151,15 @@ public class Tank {
 			break;
 		case KeyEvent.VK_CONTROL:
 			attack();
+			break;
+		case KeyEvent.VK_A:
+			superAttack();
+			break;
+		case KeyEvent.VK_F2:
+			reLive();
+			break;
+		case KeyEvent.VK_F3:
+			tc.init();
 			break;
 		}
 	}
@@ -192,11 +206,19 @@ public class Tank {
 		else if(y>TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT) y = TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT;
 		//±‹√‚◊≤«Ω
 		for(Wall w:tc.getWalls()) {
-			if(this.getRect().intersects(w.getRect())) {
-				x = oldX;
-				y = oldY;
-			}
+			if(this.getRect().intersects(w.getRect())) stay(oldX,oldY);
 		}
+		//±‹√‚ÃπøÀœ‡◊≤
+		for(Tank t:tc.getEnemies()) {
+			if(this == t) continue;
+			if(this.getRect().intersects(t.getRect())) stay(oldX,oldY);
+		}
+		if(this != tc.getMyTank() && this.getRect().intersects(tc.getMyTank().getRect())) stay(oldX,oldY); 
+	}
+	
+	void stay(int oldX, int oldY) {
+		x = oldX;
+		y = oldY;
 	}
 	
 	void locateDirection() {
@@ -231,11 +253,6 @@ public class Tank {
 	}
 	
 	public Missile attack() {
-//debug
-if(this.direction == null) {
-	System.out.println("tank direction null");
-	System.exit(1);
-}
 		Missile missile = new Missile(this.x+this.TANK_WIDTH/2-Missile.MISSILE_SIZE/2,
 				this.y+TANK_HEIGHT/2-Missile.MISSILE_SIZE/2,
 				this.direction,
@@ -246,7 +263,28 @@ if(this.direction == null) {
 		return missile;
 	}
 	
+	public void superAttack() {
+		Direction[] directions = Direction.values();
+		for(int i=0;i<directions.length;i++) {
+			Missile m = attack();
+			m.setDirection(directions[i]);
+		}
+	}
+	
 	public Rectangle getRect() {
 		return new Rectangle(x,y,this.TANK_WIDTH,TANK_HEIGHT);
+	}
+	
+	public void eat(Blood blood) {
+		if(!good) return;
+		if(blood.isLive() && this.getRect().intersects(blood.getRect())) {
+			this.life = 5;
+			blood.setLive(false);
+		}
+	}
+	
+	void reLive() {
+		if(life != 0) return;
+		life = 5;
 	}
 }

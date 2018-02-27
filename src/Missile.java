@@ -70,29 +70,29 @@ public class Missile {
 			x -= MISSILE_SPEED;
 			break;
 		case LD:
-			x -= MISSILE_SPEED;
-			y += MISSILE_SPEED;
+			x -= MISSILE_SPEED/1.41;
+			y += MISSILE_SPEED/1.41;
 			break;
 		case D:
 			y += MISSILE_SPEED;
 			break;
 		case RD:
-			x += MISSILE_SPEED;
-			y += MISSILE_SPEED;
+			x += MISSILE_SPEED/1.41;
+			y += MISSILE_SPEED/1.41;
 			break;
 		case R:
 			x += MISSILE_SPEED;
 			break;
 		case RU:
-			x += MISSILE_SPEED;
-			y -= MISSILE_SPEED;
+			x += MISSILE_SPEED/1.41;
+			y -= MISSILE_SPEED/1.41;
 			break;
 		case U:
 			y -= MISSILE_SPEED;
 			break;
 		case LU:
-			x -= MISSILE_SPEED;
-			y -= MISSILE_SPEED;
+			x -= MISSILE_SPEED/1.41;
+			y -= MISSILE_SPEED/1.41;
 			break;
 		}
 		

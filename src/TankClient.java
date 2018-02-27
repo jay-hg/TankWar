@@ -23,6 +23,7 @@ public class TankClient extends Frame {
 	private List<Missile> missiles = new LinkedList<Missile>();
 	private List<Exploder> exploders = new LinkedList<Exploder>();
 	private List<Wall> walls = new LinkedList<Wall>();
+	private Blood blood = new Blood();
 	private Image offScreenImage = null;
 	
 	public List<Missile> getMissiles() {
@@ -39,6 +40,22 @@ public class TankClient extends Frame {
 
 	public void setExploders(List<Exploder> exploders) {
 		this.exploders = exploders;
+	}
+
+	public Tank getMyTank() {
+		return myTank;
+	}
+
+	public void setMyTank(Tank myTank) {
+		this.myTank = myTank;
+	}
+
+	public List<Tank> getEnemies() {
+		return enemies;
+	}
+
+	public void setEnemies(List<Tank> enemies) {
+		this.enemies = enemies;
 	}
 
 	public List<Wall> getWalls() {
@@ -68,8 +85,13 @@ public class TankClient extends Frame {
 				else iterator.remove();
 			}
 		}
+		//血块
+		blood.draw(g);
 		//我方坦克
-		if(myTank.getLife() != 0) myTank.draw(g);
+		if(myTank.getLife() != 0) {
+			myTank.eat(blood);
+			myTank.draw(g);
+		}
 		//敌方坦克
 		for(ListIterator<Tank> iterator = enemies.listIterator();iterator.hasNext();) {
 			Tank enemy = iterator.next();
@@ -136,10 +158,7 @@ public class TankClient extends Frame {
 	
 	public static void main(String[] args) {
 		TankClient tankClient = new TankClient();
-		for(int i=0;i<5;i++) {
-			Tank t = new Tank(50+i*100,250,Tank.Direction.D,false,1,tankClient);
-			tankClient.enemies.add(t);
-		}
+		tankClient.init();
 		for(int i=0;i<2;i++) {
 			Wall w = new Wall(25+i*225,150+i*50,300,50);
 			tankClient.walls.add(w);
@@ -162,5 +181,12 @@ public class TankClient extends Frame {
 			}
 		}
 		
+	}
+	
+	public void init() {
+		for(int i=0;i<5;i++) {
+			Tank t = new Tank(50+i*100,250,Tank.Direction.D,false,1,this);
+			this.enemies.add(t);
+		}
 	}
 }
