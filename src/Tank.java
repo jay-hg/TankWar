@@ -153,6 +153,8 @@ public class Tank {
 	void move() {
 		locateDirection();
 		if(!moving) return;
+		int oldX = x;
+		int oldY = y;
 		switch(direction) {
 		case L:
 			x -= TANK_SPEED_X;
@@ -188,6 +190,13 @@ public class Tank {
 		else if(x>TankClient.WINDOW_WIDTH-this.TANK_WIDTH) x = TankClient.WINDOW_WIDTH-this.TANK_WIDTH;
 		if(y<0) y = 0;
 		else if(y>TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT) y = TankClient.WINDOW_HEIGHT-this.TANK_HEIGHT;
+		//±ÜÃâ×²Ç½
+		for(Wall w:tc.getWalls()) {
+			if(this.getRect().intersects(w.getRect())) {
+				x = oldX;
+				y = oldY;
+			}
+		}
 	}
 	
 	void locateDirection() {

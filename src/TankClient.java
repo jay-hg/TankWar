@@ -22,6 +22,7 @@ public class TankClient extends Frame {
 	private List<Tank> enemies = new LinkedList<Tank>();
 	private List<Missile> missiles = new LinkedList<Missile>();
 	private List<Exploder> exploders = new LinkedList<Exploder>();
+	private List<Wall> walls = new LinkedList<Wall>();
 	private Image offScreenImage = null;
 	
 	public List<Missile> getMissiles() {
@@ -40,17 +41,28 @@ public class TankClient extends Frame {
 		this.exploders = exploders;
 	}
 
+	public List<Wall> getWalls() {
+		return walls;
+	}
+
+	public void setWalls(List<Wall> walls) {
+		this.walls = walls;
+	}
+
 	@Override
 	public void paint(Graphics g) {
 		//子弹
 		for(ListIterator<Missile> iterator = missiles.listIterator();iterator.hasNext();) {
 			Missile missile = iterator.next();
-			//子弹打坦克
+			//子弹打坦克和墙
+			for(Wall w:walls) {
+				missile.hitWall(w);
+			}
 			for(ListIterator<Tank> it = enemies.listIterator();it.hasNext();) {
 				Tank enemy = it.next();
 				missile.hitTank(enemy);
-				missile.hitTank(myTank);
 			}
+			missile.hitTank(myTank);
 			if(missile != null) {
 				if(missile.isVisiable()) missile.draw(g);
 				else iterator.remove();
@@ -71,6 +83,10 @@ public class TankClient extends Frame {
 				if(exploder.isLive()) exploder.draw(g);
 				else iterator.remove();
 			}
+		}
+		//墙
+		for(Wall w:walls) {
+			w.draw(g);
 		}
 	}
 
@@ -123,6 +139,10 @@ public class TankClient extends Frame {
 		for(int i=0;i<5;i++) {
 			Tank t = new Tank(50+i*100,250,Tank.Direction.D,false,1,tankClient);
 			tankClient.enemies.add(t);
+		}
+		for(int i=0;i<2;i++) {
+			Wall w = new Wall(25+i*225,150+i*50,300,50);
+			tankClient.walls.add(w);
 		}
 		tankClient.launchFrame();
 	}

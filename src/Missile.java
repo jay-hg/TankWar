@@ -128,4 +128,10 @@ public class Missile {
 			}
 		}
 	}
+	
+	public void hitWall(Wall wall) {
+		if(this.getRect().intersects(wall.getRect())) {
+			this.visiable = false;
+		}
+	}
 }
